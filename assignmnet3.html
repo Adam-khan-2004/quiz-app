@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Quiz App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            background: #f2f2f2;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .center {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: gray;
+        }
+
+        .option {
+            padding: 10px;
+            border: 1px solid lightgray;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card center">
+
+    <!-- START SCREEN -->
+    <div id="startScreen">
+        <h2>Welcome to the Quiz</h2>
+        <button id="startBtn">Start Quiz</button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quizScreen" class="hidden">
+        <h3 id="questionText"></h3>
+        <div id="options"></div>
+        <p id="feedback"></p>
+        <button id="nextBtn" disabled>Next</button>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="resultScreen" class="hidden">
+        <h2>Your Score:</h2>
+        <h1 id="finalScore"></h1>
+        <p id="finalMsg"></p>
+        <button onclick="location.reload()">Restart</button>
+    </div>
+
+</div>
+
+<script>
+    // SIMPLE QUESTIONS ARRAY
+    let questions = [
+        { q: "JavaScript runs in the browser. (True/False)", options: ["True", "False"], answer: "True" },
+        { q: "CSS is used for styling. (True/False)", options: ["True", "False"], answer: "True" },
+        { q: "Which tag adds JavaScript?", options: ["<script>", "<js>"], answer: "<script>" },
+        { q: "Is HTML a programming language?", options: ["Yes", "No"], answer: "No" },
+        { q: "Flexbox helps with layout. (True/False)", options: ["True", "False"], answer: "True" }
+    ];
+
+    let index = 0;
+    let score = 0;
+
+    let startScreen = document.getElementById("startScreen");
+    let quizScreen = document.getElementById("quizScreen");
+    let resultScreen = document.getElementById("resultScreen");
+
+    let questionText = document.getElementById("questionText");
+    let optionsDiv = document.getElementById("options");
+    let feedback = document.getElementById("feedback");
+    let nextBtn = document.getElementById("nextBtn");
+    let finalScore = document.getElementById("finalScore");
+    let finalMsg = document.getElementById("finalMsg");
+
+    document.getElementById("startBtn").onclick = function () {
+        startScreen.classList.add("hidden");
+        quizScreen.classList.remove("hidden");
+        loadQuestion();
+    };
+
+    function loadQuestion() {
+        nextBtn.disabled = true;
+        feedback.textContent = "";
+
+        let qObj = questions[index];
+        questionText.textContent = qObj.q;
+
+        optionsDiv.innerHTML = "";
+
+        qObj.options.forEach(function (opt) {
+            let btn = document.createElement("div");
+            btn.className = "option";
+            btn.textContent = opt;
+
+            btn.onclick = function () {
+                checkAnswer(opt, qObj.answer, this);
+            };
+
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, correct, element) {
+        let all = document.querySelectorAll(".option");
+        all.forEach(op => op.style.pointerEvents = "none");
+
+        if (selected === correct) {
+            score++;
+            feedback.textContent = "Correct!";
+        } else {
+            feedback.textContent = "Wrong!";
+        }
+
+        nextBtn.disabled = false;
+    }
+
+    nextBtn.onclick = function () {
+        index++;
+        if (index < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    };
+
+    function showResult() {
+        quizScreen.classList.add("hidden");
+        resultScreen.classList.remove("hidden");
+
+        finalScore.textContent = score + " / " + questions.length;
+
+        if (score >= 4) finalMsg.textContent = "Great Job!";
+        else if (score >= 2) finalMsg.textContent = "Good Try!";
+        else finalMsg.textContent = "Try Again!";
+    }
+</script>
+
+</body>
+</html>
